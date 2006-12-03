@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Net-Frame-Tools
+version:             1.00_01
+abstract:            small useful network utilities created using Net::Frame
+license:             Artistic
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Net::Frame:                    0
+    Net::Frame::Device:            0
+    Net::Frame::Dump:              0
+    Net::Frame::Simple:            0
+    Net::Write:                    1.00
+    Term::ReadLine:                0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - GomoR <perl@gomor.org>
