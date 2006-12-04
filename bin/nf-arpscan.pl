@@ -1,0 +1,122 @@
+#!/usr/bin/perl
+#
+# $Id: nf-arpscan.pl,v 1.1 2006/12/04 21:20:15 gomor Exp $
+#
+use strict;
+use warnings;
+
+our $VERSION = '1.00';
+
+use Getopt::Std;
+my %opts;
+getopts('n:v', \%opts);
+
+my $oWrite;
+my $oDump;
+
+die("Usage: $0\n".
+    "\n".
+    "   -n  network subnet\n".
+    "   -v  be verbose\n".
+    "") unless $opts{n};
+
+use Net::Frame::ETH qw(:consts);
+use Net::Frame::ARP qw(:consts);
+use Net::Frame::Simple;
+use Net::Frame::Dump;
+use Net::Frame::Device;
+use Net::Write::Layer2;
+use Net::Netmask;
+
+my $oNet = Net::Netmask->new2($opts{n}) or die("$Net::Netmask::errstr");
+my @ipList = $oNet->enumerate;
+
+my $oDevice = Net::Frame::Device->new(target => $ipList[1]);
+if ($opts{v}) {
+   print "Using device    : ".$oDevice->dev."\n";
+   print "Using source MAC: ".$oDevice->mac."\n";
+   print "Using source IP : ".$oDevice->ip."\n";
+}
+
+my @requestList;
+for my $ip (@ipList) {
+   my $eth = Net::Frame::ETH->new(
+      type => NP_ETH_TYPE_ARP,
+      src  => $oDevice->mac,
+   );
+   my $arp = Net::Frame::ARP->new(
+      opCode => NP_ARP_OPCODE_REQUEST,
+      srcIp => $oDevice->ip,
+      dstIp => $ip,
+      src   => $oDevice->mac,
+   );
+   my $request = Net::Frame::Simple->new(
+      layers => [ $eth, $arp ],
+   );
+   push @requestList, $request;
+}
+
+$oWrite = Net::Write::Layer2->new(dev => $oDevice->dev);
+$oWrite->open;
+
+$oDump = Net::Frame::Dump->new(
+   dev    => $oDevice->dev,
+   filter => 'arp',
+);
+$oDump->start;
+
+my $reply;
+for my $t (1..3) {
+   for my $r (@requestList) {
+      my $dstIp = $r->ref->{ARP}->dstIp;
+      $oWrite->send($r->raw) unless exists $reply->{$dstIp};
+   }
+   until ($oDump->timeout) {
+      if (my $h = $oDump->next) {
+         my $r = Net::Frame::Simple->new(
+            firstLayer => $h->{firstLayer},
+            timestamp  => $h->{timestamp},
+            raw        => $h->{raw},
+         );
+         next unless $r->ref->{ARP}->opCode eq NP_ARP_OPCODE_REPLY;
+         my $srcIp = $r->ref->{ARP}->srcIp;
+         unless (exists $reply->{$srcIp}) {
+            my $mac = $r->ref->{ARP}->src;
+            print "> received $mac for $srcIp\n" if $opts{v};
+            $reply->{$srcIp} = $r->ref->{ARP}->src;
+         }
+      }
+   }
+   $oDump->timeoutReset;
+}
+
+for (keys %$reply) {
+   printf("%-16s => %s\n", $_, $reply->{$_});
+}
+
+END {
+   $oWrite && $oWrite->close;
+   if ($oDump && $oDump->isRunning) {
+      $oDump->stop;
+      $oDump->clean;
+   }
+}
+
+__END__
+
+=head1 NAME
+
+nf-arpscan - Net::Frame ARP Scan tool
+
+=head1 AUTHOR
+
+Patrice E<lt>GomoRE<gt> Auffret
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2006, Patrice E<lt>GomoRE<gt> Auffret
+
+You may distribute this module under the terms of the Artistic license.
+See LICENSE.Artistic file in the source distribution archive.
+
+=cut

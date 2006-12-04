@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-sniff.pl,v 1.1 2006/11/30 17:55:06 gomor Exp $
+# $Id: nf-sniff.pl,v 1.2 2006/12/04 21:20:53 gomor Exp $
 #
 use strict;
 use warnings;
@@ -9,28 +9,35 @@ our $VERSION = '1.00';
 
 use Getopt::Std;
 my %opts;
-getopts('F:i:', \%opts);
+getopts('F:i:w:', \%opts);
+
+my $oDump;
 
 die("Usage: $0\n".
     "\n".
     "   -i  network interface to sniff on\n".
     "   -F  pcap filter to use\n".
+    "   -w  write to file\n".
     "") unless $opts{i};
 
 use Net::Frame::Dump qw(:consts);
 use Net::Frame::Simple;
 
-my $d = Net::Frame::Dump->new(
+$oDump = Net::Frame::Dump->new(
    dev  => $opts{i},
    mode => NP_DUMP_MODE_ONLINE,
 );
-$d->filter($opts{F}) if $opts{F};
+$oDump->filter($opts{F}) if $opts{F};
+if ($opts{w}) {
+   $oDump->file($opts{w});
+   $oDump->unlinkOnClean(0);
+}
 
-$d->start;
+$oDump->start;
 
 my $count = 0;
 while (1) {
-   if (my $h = $d->next) {
+   if (my $h = $oDump->next) {
       my $f = Net::Frame::Simple->new(
          raw        => $h->{raw},
          firstLayer => $h->{firstLayer},
@@ -42,13 +49,13 @@ while (1) {
    }
 }
 
-$d->stop;
-$d->clean;
+$oDump->stop;
+$oDump->clean;
 
 END {
-   if ($d && $d->isRunning) {
-      $d->stop;
-      $d->clean;
+   if ($oDump && $oDump->isRunning) {
+      $oDump->stop;
+      $oDump->clean;
    }
 }
 

@@ -1,4 +1,5 @@
 bin/nf-arphijack.pl
+bin/nf-arpscan.pl
 bin/nf-cat.pl
 bin/nf-dsniff.pl
 bin/nf-grep.pl

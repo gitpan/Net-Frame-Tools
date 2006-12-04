@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Net-Frame-Tools
-version:             1.00_01
+version:             1.00_02
 abstract:            small useful network utilities created using Net::Frame
 license:             Artistic
 generated_by:        ExtUtils::MakeMaker version 6.31
@@ -10,6 +10,7 @@ requires:
     Net::Frame::Device:            0
     Net::Frame::Dump:              0
     Net::Frame::Simple:            0
+    Net::Netmask:                  0
     Net::Write:                    1.00
     Term::ReadLine:                0
 meta-spec:
