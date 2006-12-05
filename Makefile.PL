@@ -1,13 +1,15 @@
 #
-# $Id: Makefile.PL,v 1.3 2006/12/04 21:20:00 gomor Exp $
+# $Id: Makefile.PL,v 1.4 2006/12/05 20:39:27 gomor Exp $
 #
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-   NAME      => 'Net::Frame::Tools',
-   VERSION   => '1.00_02',
-   ABSTRACT  => 'small useful network utilities created using Net::Frame',
-   LICENSE   => 'Artistic',
+   NAME          => 'Net::Frame::Tools',
+   VERSION_FROM  => 'lib/Net/Frame/Tools.pm',
+   ABSTRACT_FROM => 'lib/Net/Frame/Tools.pm',
+   LICENSE       => 'Artistic',
+   AUTHOR        => 'GomoR <perl@gomor.org>',
+   EXE_FILES     => [ @{[glob('bin/*.pl')]} ],
    PREREQ_PM => {
       Net::Write         => '1.00',
       Net::Frame         => 0,
@@ -17,6 +19,4 @@ WriteMakefile(
       Net::Netmask       => 0,
       Term::ReadLine     => 0,
    },
-   EXE_FILES => [ @{[glob('bin/*.pl')]} ],
-   AUTHOR    => 'GomoR <perl@gomor.org>',
 );

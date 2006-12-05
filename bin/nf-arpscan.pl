@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-arpscan.pl,v 1.1 2006/12/04 21:20:15 gomor Exp $
+# $Id: nf-arpscan.pl,v 1.2 2006/12/05 20:45:39 gomor Exp $
 #
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ die("Usage: $0\n".
 use Net::Frame::ETH qw(:consts);
 use Net::Frame::ARP qw(:consts);
 use Net::Frame::Simple;
-use Net::Frame::Dump;
+use Net::Frame::Dump::Online;
 use Net::Frame::Device;
 use Net::Write::Layer2;
 use Net::Netmask;
@@ -59,7 +59,7 @@ for my $ip (@ipList) {
 $oWrite = Net::Write::Layer2->new(dev => $oDevice->dev);
 $oWrite->open;
 
-$oDump = Net::Frame::Dump->new(
+$oDump = Net::Frame::Dump::Online->new(
    dev    => $oDevice->dev,
    filter => 'arp',
 );
@@ -73,11 +73,7 @@ for my $t (1..3) {
    }
    until ($oDump->timeout) {
       if (my $h = $oDump->next) {
-         my $r = Net::Frame::Simple->new(
-            firstLayer => $h->{firstLayer},
-            timestamp  => $h->{timestamp},
-            raw        => $h->{raw},
-         );
+         my $r = Net::Frame::SimpleFromDump->new($h);
          next unless $r->ref->{ARP}->opCode eq NP_ARP_OPCODE_REPLY;
          my $srcIp = $r->ref->{ARP}->srcIp;
          unless (exists $reply->{$srcIp}) {
@@ -96,10 +92,7 @@ for (keys %$reply) {
 
 END {
    $oWrite && $oWrite->close;
-   if ($oDump && $oDump->isRunning) {
-      $oDump->stop;
-      $oDump->clean;
-   }
+   $oDump  && $oDump->isRunning && $oDump->stop;
 }
 
 __END__

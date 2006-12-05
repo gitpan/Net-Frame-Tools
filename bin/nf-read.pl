@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-read.pl,v 1.1 2006/11/30 17:55:06 gomor Exp $
+# $Id: nf-read.pl,v 1.2 2006/12/05 20:45:39 gomor Exp $
 #
 use strict;
 use warnings;
@@ -11,37 +11,32 @@ use Getopt::Std;
 my %opts;
 getopts('f:F:', \%opts);
 
+my $oDump;
+
 die("Usage: $0\n".
     "\n".
     "   -f  file to read\n".
     "   -F  pcap filter to use\n".
     "") unless $opts{f};
 
-use Net::Frame::Dump qw(:consts);
+use Net::Frame::Dump::Offline;
 use Net::Frame::Simple;
 
-my $d = Net::Frame::Dump->new(
-   dev  => 'non',
-   file => $opts{f},
-   mode => NP_DUMP_MODE_OFFLINE,
-);
-$d->filter($opts{F}) if $opts{F};
+$oDump = Net::Frame::Dump::Offline->new(file => $opts{f});
+$oDump->filter($opts{F}) if $opts{F};
 
-$d->start;
+$oDump->start;
+
 my $count = 0;
-while (my $h = $d->next) {
-   my $f = Net::Frame::Simple->new(
-      raw        => $h->{raw},
-      firstLayer => $h->{firstLayer},
-      timestamp  => $h->{timestamp},
-   );
+while (my $h = $oDump->next) {
+   my $f = Net::Frame::Simple->newFromDump($h);
    my $len = length($h->{raw});
-   print 'o Frame number: '.$count++." (length: $len)\n";
+   my $ts  = $h->{timestamp};
+   print 'o Frame number: '.$count++." (length: $len, timestamp: $ts)\n";
    print $f->print."\n";
 }
 
-$d->stop;
-$d->clean;
+END { $oDump && $oDump->isRunning && $oDump->stop }
 
 __END__
 

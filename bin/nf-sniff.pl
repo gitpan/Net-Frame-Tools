@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-sniff.pl,v 1.2 2006/12/04 21:20:53 gomor Exp $
+# $Id: nf-sniff.pl,v 1.3 2006/12/05 20:45:39 gomor Exp $
 #
 use strict;
 use warnings;
@@ -20,17 +20,14 @@ die("Usage: $0\n".
     "   -w  write to file\n".
     "") unless $opts{i};
 
-use Net::Frame::Dump qw(:consts);
+use Net::Frame::Dump::Online;
 use Net::Frame::Simple;
 
-$oDump = Net::Frame::Dump->new(
-   dev  => $opts{i},
-   mode => NP_DUMP_MODE_ONLINE,
-);
+$oDump = Net::Frame::Dump::Online->new(dev => $opts{i});
 $oDump->filter($opts{F}) if $opts{F};
 if ($opts{w}) {
    $oDump->file($opts{w});
-   $oDump->unlinkOnClean(0);
+   $oDump->unlinkOnStop(0);
 }
 
 $oDump->start;
@@ -38,26 +35,15 @@ $oDump->start;
 my $count = 0;
 while (1) {
    if (my $h = $oDump->next) {
-      my $f = Net::Frame::Simple->new(
-         raw        => $h->{raw},
-         firstLayer => $h->{firstLayer},
-         timestamp  => $h->{timestamp},
-      );
+      my $f   = Net::Frame::Simple->newFromDump($h);
       my $len = length($h->{raw});
-      print 'o Frame number: '.$count++." (length: $len)\n";
+      my $ts  = $h->{timestamp};
+      print 'o Frame number: '.$count++." (length: $len, timestamp: $ts)\n";
       print $f->print."\n";
    }
 }
 
-$oDump->stop;
-$oDump->clean;
-
-END {
-   if ($oDump && $oDump->isRunning) {
-      $oDump->stop;
-      $oDump->clean;
-   }
-}
+END { $oDump && $oDump->isRunning && $oDump->stop }
 
 __END__
 

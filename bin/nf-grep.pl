@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-grep.pl,v 1.2 2006/12/03 16:47:03 gomor Exp $
+# $Id: nf-grep.pl,v 1.3 2006/12/05 20:45:39 gomor Exp $
 #
 use strict;
 use warnings;
@@ -11,6 +11,8 @@ use Getopt::Std;
 my %opts;
 getopts('f:F:e:i:', \%opts);
 
+my $oDump;
+
 die("Usage: $0\n".
     "\n".
     "   -i  network interface to sniff on\n".
@@ -19,53 +21,41 @@ die("Usage: $0\n".
     "   -F  pcap filter to use\n".
     "") unless $opts{i} && $opts{e};
 
-use Net::Frame::Dump qw(:consts);
+use Net::Frame::Dump::Online;
+use Net::Frame::Dump::Offline;
 use Net::Frame::Simple;
 
-my $d;
 if ($opts{f}) {
-   $d = Net::Frame::Dump->new(
-      dev  => 'none',
-      file => $opts{f},
-      mode => NP_DUMP_MODE_OFFLINE,
-   );
+   $oDump = Net::Frame::Dump::Offline->new(file => $opts{f});
 }
 else {
-   $d = Net::Frame::Dump->new(
-      dev  => $opts{i},
-      mode => NP_DUMP_MODE_ONLINE,
-   );
+   $oDump = Net::Frame::Dump::Online->new(dev  => $opts{i});
 }
-$d->filter($opts{F}) if $opts{F};
+$oDump->filter($opts{F}) if $opts{F};
 
-$d->start;
+$oDump->start;
 
 my $count = 0;
 if ($opts{f}) {
-   while (my $h = $d->next) {
+   while (my $h = $oDump->next) {
       analyzeNext($h, $count);
       $count++;
    }
 }
 else {
    while (1) {
-      if (my $h = $d->next) {
+      if (my $h = $oDump->next) {
          analyzeNext($h, $count);
          $count++;
       }
    }
 }
 
-$d->stop;
-$d->clean;
+$oDump->stop;
 
 sub analyzeNext {
    my ($h, $c) = @_;
-   my $f = Net::Frame::Simple->new(
-      raw        => $h->{raw},
-      firstLayer => $h->{firstLayer},
-      timestamp  => $h->{timestamp},
-   );
+   my $f = Net::Frame::Simple->newFromDump($h);
    my $l;
    if (($l = $f->ref->{TCP}) || ($l = $f->ref->{UDP})) {
       if (my $payload = $l->payload) {
@@ -78,12 +68,7 @@ sub analyzeNext {
    }
 }
 
-END {
-   if ($d && $d->isRunning) {
-      $d->stop;
-      $d->clean;
-   }
-}
+END { $oDump && $oDump->isRunning && $oDump->stop }
 
 __END__
 

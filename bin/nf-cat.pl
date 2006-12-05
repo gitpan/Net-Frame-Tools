@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-cat.pl,v 1.3 2006/12/03 16:38:59 gomor Exp $
+# $Id: nf-cat.pl,v 1.4 2006/12/05 20:45:39 gomor Exp $
 #
 use strict;
 use warnings;
@@ -10,6 +10,9 @@ our $VERSION = '1.00';
 use Getopt::Std;
 my %opts;
 getopts('234i:d:rL:v', \%opts);
+
+my $oDump;
+my $oWrite;
 
 die("Usage: $0 [parameters]\n".
     "\n".
@@ -32,7 +35,7 @@ die("Usage: $0 [parameters]\n".
    ) unless ($opts{2} || $opts{3} || $opts{4});
 
 use Net::Frame::Simple;
-use Net::Frame::Dump;
+use Net::Frame::Dump::Online;
 use Net::Frame::Device;
 
 my $oDevice = Net::Frame::Device->new;
@@ -91,7 +94,6 @@ if (! $int) {
    }
 }
 
-my $oWrite;
 if ($opts{2}) {
    use Net::Write::Layer2;
    $oWrite = Net::Write::Layer2->new(dev => $int);
@@ -105,9 +107,9 @@ elsif ($opts{4}) {
    $oWrite = Net::Write::Layer4->new(dst => $dst);
 }
 
-my $oDump;
+$oDump;
 if ($opts{r}) {
-   $oDump = Net::Frame::Dump->new(dev => $int);
+   $oDump = Net::Frame::Dump::Online->new(dev => $int);
    $oDump->start;
 }
 
@@ -122,8 +124,11 @@ if ($opts{r}) {
          last;
       }
    }
-   $oDump->stop;
-   $oDump->clean;
+}
+
+END {
+   $oWrite && $oWrite->close;
+   $oDump  && $oDump->isRunning && $oDump->stop;
 }
 
 __END__
