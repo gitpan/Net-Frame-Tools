@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-cat.pl,v 1.4 2006/12/05 20:45:39 gomor Exp $
+# $Id: nf-cat.pl,v 1.5 2006/12/06 21:29:48 gomor Exp $
 #
 use strict;
 use warnings;
@@ -85,8 +85,7 @@ if (! $dst) {
 my $int = $opts{i};
 if (! $int) {
    if ($dst) {
-      $oDevice->target($dst);
-      $oDevice->updateFromTarget;
+      $oDevice->updateFromTarget($dst);
       $int = $oDevice->dev;
    }
    else {
@@ -107,7 +106,6 @@ elsif ($opts{4}) {
    $oWrite = Net::Write::Layer4->new(dst => $dst);
 }
 
-$oDump;
 if ($opts{r}) {
    $oDump = Net::Frame::Dump::Online->new(dev => $int);
    $oDump->start;
