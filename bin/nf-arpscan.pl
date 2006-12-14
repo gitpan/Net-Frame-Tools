@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-arpscan.pl,v 1.2 2006/12/05 20:45:39 gomor Exp $
+# $Id: nf-arpscan.pl,v 1.3 2006/12/14 17:46:01 gomor Exp $
 #
 use strict;
 use warnings;
@@ -41,11 +41,11 @@ if ($opts{v}) {
 my @requestList;
 for my $ip (@ipList) {
    my $eth = Net::Frame::ETH->new(
-      type => NP_ETH_TYPE_ARP,
+      type => NF_ETH_TYPE_ARP,
       src  => $oDevice->mac,
    );
    my $arp = Net::Frame::ARP->new(
-      opCode => NP_ARP_OPCODE_REQUEST,
+      opCode => NF_ARP_OPCODE_REQUEST,
       srcIp => $oDevice->ip,
       dstIp => $ip,
       src   => $oDevice->mac,
@@ -73,8 +73,8 @@ for my $t (1..3) {
    }
    until ($oDump->timeout) {
       if (my $h = $oDump->next) {
-         my $r = Net::Frame::SimpleFromDump->new($h);
-         next unless $r->ref->{ARP}->opCode eq NP_ARP_OPCODE_REPLY;
+         my $r = Net::Frame::Simple->newFromDump($h);
+         next unless $r->ref->{ARP}->opCode eq NF_ARP_OPCODE_REPLY;
          my $srcIp = $r->ref->{ARP}->srcIp;
          unless (exists $reply->{$srcIp}) {
             my $mac = $r->ref->{ARP}->src;

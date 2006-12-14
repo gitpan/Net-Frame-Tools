@@ -1,7 +1,9 @@
 #
-# $Id: Makefile.PL,v 1.4 2006/12/05 20:39:27 gomor Exp $
+# $Id: Makefile.PL,v 1.5 2006/12/14 17:45:15 gomor Exp $
 #
 use ExtUtils::MakeMaker;
+
+require v5.6.1;
 
 WriteMakefile(
    NAME          => 'Net::Frame::Tools',
