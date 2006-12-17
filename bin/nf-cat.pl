@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-cat.pl,v 1.5 2006/12/06 21:29:48 gomor Exp $
+# $Id: nf-cat.pl,v 1.6 2006/12/17 17:05:18 gomor Exp $
 #
 use strict;
 use warnings;
@@ -72,12 +72,14 @@ if ($opts{v}) {
 
 # Try to guess destination
 my $dst = $opts{d};
-if (! $dst) {
-   if (my $l = $oSimple->ref->{IPv4}) {
-      $dst = $l->dst;
-   }
-   else {
-      die("Unable to guess destination IP address, you should specify -d\n");
+unless ($opts{2}) {
+   if (! $dst) {
+      if (my $l = $oSimple->ref->{IPv4}) {
+         $dst = $l->dst;
+      }
+      else {
+         die("Unable to guess destination IP address, you should specify -d\n");
+      }
    }
 }
 

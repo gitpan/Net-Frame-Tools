@@ -1,11 +1,11 @@
 #
-# $Id: Tools.pm,v 1.3 2006/12/14 17:46:16 gomor Exp $
+# $Id: Tools.pm,v 1.4 2006/12/17 17:08:17 gomor Exp $
 #
 package Net::Frame::Tools;
 use strict;
 use warnings;
 
-our $VERSION = '1.00_05';
+our $VERSION = '1.00_06';
 
 1;
 

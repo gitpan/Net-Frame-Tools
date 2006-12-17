@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-shell.pl,v 1.2 2006/12/05 20:45:39 gomor Exp $
+# $Id: nf-shell.pl,v 1.3 2006/12/17 17:08:17 gomor Exp $
 #
 package Net::Frame::Shell;
 use strict;
@@ -33,9 +33,9 @@ my $oDump;
    no strict 'refs';
    for my $l (@layerList) {
       *$l = sub {
-         (my $module = "Net::Frame::$l") =~ s/::/\//g;
+         (my $module = "Net::Frame::Layer::$l") =~ s/::/\//g;
          require $module.'.pm';
-         my $r = "Net::Frame::$l"->new(@_);
+         my $r = "Net::Frame::Layer::$l"->new(@_);
          $r->pack;
          $r;
       };

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-arpscan.pl,v 1.3 2006/12/14 17:46:01 gomor Exp $
+# $Id: nf-arpscan.pl,v 1.4 2006/12/17 17:08:17 gomor Exp $
 #
 use strict;
 use warnings;
@@ -20,8 +20,8 @@ die("Usage: $0\n".
     "   -v  be verbose\n".
     "") unless $opts{n};
 
-use Net::Frame::ETH qw(:consts);
-use Net::Frame::ARP qw(:consts);
+use Net::Frame::Layer::ETH qw(:consts);
+use Net::Frame::Layer::ARP qw(:consts);
 use Net::Frame::Simple;
 use Net::Frame::Dump::Online;
 use Net::Frame::Device;
@@ -40,11 +40,11 @@ if ($opts{v}) {
 
 my @requestList;
 for my $ip (@ipList) {
-   my $eth = Net::Frame::ETH->new(
+   my $eth = Net::Frame::Layer::ETH->new(
       type => NF_ETH_TYPE_ARP,
       src  => $oDevice->mac,
    );
-   my $arp = Net::Frame::ARP->new(
+   my $arp = Net::Frame::Layer::ARP->new(
       opCode => NF_ARP_OPCODE_REQUEST,
       srcIp => $oDevice->ip,
       dstIp => $ip,
