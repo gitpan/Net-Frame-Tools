@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-arpscan.pl,v 1.4 2006/12/17 17:08:17 gomor Exp $
+# $Id: nf-arpscan.pl,v 1.5 2007/04/02 16:45:38 gomor Exp $
 #
 use strict;
 use warnings;
@@ -101,13 +101,23 @@ __END__
 
 nf-arpscan - Net::Frame ARP Scan tool
 
+=head1 SYNOPSIS
+
+   # nf-arpscan.pl -n 192.168.0
+   192.168.0.1      => 00:0c:29:aa:bb:cc
+   192.168.0.69     => 00:13:d4:aa:bb:cc
+
+=head1 DESCRIPTION
+
+This tool will scan a specified C-class address space to find alive hosts (the ones who respond to ARP requests).
+
 =head1 AUTHOR
 
 Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2007, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

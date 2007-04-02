@@ -1,11 +1,11 @@
 bin/nf-arphijack.pl
 bin/nf-arpscan.pl
 bin/nf-cat.pl
-bin/nf-dsniff.pl
 bin/nf-grep.pl
 bin/nf-read.pl
 bin/nf-shell.pl
 bin/nf-sniff.pl
+bin/nf-trace.pl
 Changes
 lib/Net/Frame/Tools.pm
 LICENSE

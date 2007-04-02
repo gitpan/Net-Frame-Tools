@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-grep.pl,v 1.3 2006/12/05 20:45:39 gomor Exp $
+# $Id: nf-grep.pl,v 1.4 2007/04/02 16:46:49 gomor Exp $
 #
 use strict;
 use warnings;
@@ -76,13 +76,23 @@ __END__
 
 nf-grep - Net::Frame Grep tool
 
+=head1 SYNOPSIS
+
+   # nf-grep.pl -i eth0 -e 'TEST'
+   o Frame number: 95
+   TEST
+
+=head1 DESCRIPTION
+
+This tool implements the classical network grep (ngrep) command.
+
 =head1 AUTHOR
 
 Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2007, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

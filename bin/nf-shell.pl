@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 #
-# $Id: nf-shell.pl,v 1.3 2006/12/17 17:08:17 gomor Exp $
+# $Id: nf-shell.pl,v 1.4 2007/04/02 16:47:37 gomor Exp $
 #
 package Net::Frame::Shell;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '0.10';
 
 my @subList = qw(
    F sr sd sd2 sd3 sniff dsniff read
@@ -190,13 +190,21 @@ __END__
 
 nf-shell - Net::Frame Shell tool
 
+=head1 SYNOPSIS
+
+   None for now.
+
+=head1 DESCRIPTION
+
+This tool is in its very early stages. It tries to mimic the well-known Scapy tool.
+
 =head1 AUTHOR
 
 Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2007, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

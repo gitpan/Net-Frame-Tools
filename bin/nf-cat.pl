@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-cat.pl,v 1.6 2006/12/17 17:05:18 gomor Exp $
+# $Id: nf-cat.pl,v 1.7 2007/04/02 16:46:41 gomor Exp $
 #
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ our $VERSION = '1.00';
 
 use Getopt::Std;
 my %opts;
-getopts('234i:d:rL:v', \%opts);
+getopts('R234i:d:rL:v', \%opts);
 
 my $oDump;
 my $oWrite;
@@ -28,6 +28,7 @@ die("Usage: $0 [parameters]\n".
     "   -d  target destination IP address\n".
     "\n".
     " o Common parameters:\n".
+    "   -R  send as a raw string\n".
     "   -r  get and print frame reply\n".
     "   -L  first layer contained in raw data (example: IPv4)\n".
     "   -v  be more verbose\n".
@@ -43,15 +44,12 @@ my $oDevice = Net::Frame::Device->new;
 my $data;
 while (<>) {
    chomp;
-   if (/^[\da-f]+/) {
-      ($data = $_) =~ s/^[^\da-f]+//;
-      last;
-   }
+   $data = $_;
 }
 
-# Try to guess first layer
+# Try to guess first layer when -3 used
 my $firstLayer = $opts{L};
-if (! $firstLayer) {
+if (! $opts{R} && $opts{3} && ! $firstLayer) {
    if ($data =~ /^4/) {
       $firstLayer = 'IPv4';
    }
@@ -60,19 +58,27 @@ if (! $firstLayer) {
    }
 }
 
-# Reassemble frame
-my $oSimple = Net::Frame::Simple->new(
-   raw        => pack('H*', $data),
-   firstLayer => $firstLayer,
-);
+# If -2 used, and firstLayer not specified, and no -R, we don't know
+if (! $opts{R} && $opts{2} && ! $firstLayer) {
+   die("Unable to guess first layer type, you should specify -L\n");
+}
 
-if ($opts{v}) {
+# Reassemble frame
+my $oSimple;
+if (! $opts{R}) {
+   $oSimple = Net::Frame::Simple->new(
+      raw        => pack('H*', $data),
+      firstLayer => $firstLayer,
+   );
+}
+
+if ($oSimple && $opts{v}) {
    print $oSimple->print."\n";
 }
 
 # Try to guess destination
 my $dst = $opts{d};
-unless ($opts{2}) {
+if (! $opts{2} && $oSimple) {
    if (! $dst) {
       if (my $l = $oSimple->ref->{IPv4}) {
          $dst = $l->dst;
@@ -117,7 +123,7 @@ $oWrite->open;
 $oWrite->send(pack('H*', $data));
 $oWrite->close;
 
-if ($opts{r}) {
+if ($opts{r} && $oSimple) {
    until ($oDump->timeout) {
       if (my $reply = $oSimple->recv($oDump)) {
          print $reply->print."\n";
@@ -137,13 +143,29 @@ __END__
 
 nf-cat - Net::Frame Cat tool
 
+=head1 SYNOPSIS
+
+   # printf "AAAAAAAAAAA" |nf-cat.pl -i eth0 -2R
+
+   # printf "ffffffffffff00000000000088641100000100000021" | \
+        nf-cat.pl -i eth0 -2L ETH -v
+   ETH: dst:ff:ff:ff:ff:ff:ff  src:00:00:00:00:00:00  type:0x8864
+   PPPoES: version:1  type:1  code:0x00  sessionId:0x0001
+   PPPoES: payloadLength:0  pppProtocol:0x0021
+
+=head1 DESCRIPTION
+
+This tool is like well-known netcat, but works at various layers. For example, you may send a raw string at layer 2, like in the first example B<SYNOPSIS>.
+
+You may also send fully crafted frames, like in the second example, where we inject an Ethernet frame which encapsulate a PPPoES layer.
+
 =head1 AUTHOR
 
 Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2007, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.
