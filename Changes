@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Frame::Tools.
 
+1.01 Mon Apr 23 22:53:18 CEST 2007
+   - added test Pod::Coverage
+
 1.00 Mon Apr  2 18:49:42 CEST 2007
    - first public release
 
