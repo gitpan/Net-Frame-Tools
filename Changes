@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Frame::Tools.
 
+1.02 Wed Feb 20 14:01:58 CET 2008
+   - update: license string, to make CPANTS happy
+   - added example
+
 1.01 Mon Apr 23 22:53:18 CEST 2007
    - added test Pod::Coverage
 

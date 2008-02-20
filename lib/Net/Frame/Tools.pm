@@ -1,11 +1,11 @@
 #
-# $Id: Tools.pm,v 1.6 2007/04/23 20:54:04 gomor Exp $
+# $Id: Tools.pm 148 2008-02-20 12:57:50Z gomor $
 #
 package Net::Frame::Tools;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 1;
 
@@ -27,7 +27,7 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2007, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2008, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

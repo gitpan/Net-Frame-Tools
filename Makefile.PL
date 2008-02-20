@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL,v 1.5 2006/12/14 17:45:15 gomor Exp $
+# $Id: Makefile.PL 148 2008-02-20 12:57:50Z gomor $
 #
 use ExtUtils::MakeMaker;
 
@@ -9,7 +9,7 @@ WriteMakefile(
    NAME          => 'Net::Frame::Tools',
    VERSION_FROM  => 'lib/Net/Frame/Tools.pm',
    ABSTRACT_FROM => 'lib/Net/Frame/Tools.pm',
-   LICENSE       => 'Artistic',
+   LICENSE       => 'artistic',
    AUTHOR        => 'GomoR <perl@gomor.org>',
    EXE_FILES     => [ @{[glob('bin/*.pl')]} ],
    PREREQ_PM => {

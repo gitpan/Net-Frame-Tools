@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-shell.pl,v 1.4 2007/04/02 16:47:37 gomor Exp $
+# $Id: nf-shell.pl 148 2008-02-20 12:57:50Z gomor $
 #
 package Net::Frame::Shell;
 use strict;
@@ -204,7 +204,7 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2007, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2008, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

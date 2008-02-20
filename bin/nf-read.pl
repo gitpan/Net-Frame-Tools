@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-read.pl,v 1.3 2007/04/02 16:46:59 gomor Exp $
+# $Id: nf-read.pl 148 2008-02-20 12:57:50Z gomor $
 #
 use strict;
 use warnings;
@@ -83,7 +83,7 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2007, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2008, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

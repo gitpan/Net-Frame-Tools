@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-trace.pl,v 1.1 2007/04/02 16:49:13 gomor Exp $
+# $Id: nf-trace.pl 148 2008-02-20 12:57:50Z gomor $
 #
 use strict;
 use warnings;
@@ -207,7 +207,7 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2007, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2008, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.
