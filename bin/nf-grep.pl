@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: nf-grep.pl 148 2008-02-20 12:57:50Z gomor $
+# $Id: nf-grep.pl 344 2011-03-23 17:52:03Z gomor $
 #
 use strict;
 use warnings;
@@ -13,13 +13,15 @@ getopts('f:F:e:i:', \%opts);
 
 my $oDump;
 
-die("Usage: $0\n".
-    "\n".
-    "   -i  network interface to sniff on\n".
-    "   -e  regex, will be applied on application layer (for TCP and UDP)\n".
-    "   -f  file to read\n".
-    "   -F  pcap filter to use\n".
-    "") unless $opts{i} && $opts{e};
+unless (($opts{i} || $opts{f}) && $opts{e}) {
+   die("Usage: $0 -i device|-f file -e regex [-F filter]\n".
+       "\n".
+       "   -i  network interface to sniff on\n".
+       "   -e  regex, will be applied on application layer (for TCP and UDP)\n".
+       "   -f  file to read\n".
+       "   -F  pcap filter to use\n".
+       "");
+}
 
 use Net::Frame::Dump::Online;
 use Net::Frame::Dump::Offline;
@@ -92,7 +94,7 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2008, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2011, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.
